@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.lv.shop.mapper.user.UserMapper" >
+	<select id="getUserList" resultType="org.lv.shop.entity.user.User" parameterType="org.lv.shop.util.Page">
+		select userId,userName,loggerName,userImg,userSex,userEime,userPhone,userPassWord,userBir
+		from gang_user limit #{strat},#{pagecount}
+	</select>
+	
+	<select id="getUserCount" resultType="int" parameterType="org.lv.shop.util.Page">
+		select count(*) from gang_user
+	</select>
+	
+	<insert id="insertUser" parameterType="org.lv.shop.entity.user.User">
+		insert into gang_user values(#{userId},#{userName},#{loggerName},#{userPassWord},#{userSex},#{userBir},#{userImg},#{userEime},#{userPhone})
+	</insert>
+	
+	<delete id="deleteUserByUserId" parameterType="string">
+		delete from gang_user where userId=#{userId} 
+	</delete>
+	
+	 <select id="toupdateUserById" parameterType="string" resultType="org.lv.shop.entity.user.User">
+		select userId,userName,loggerName,userImg,userSex,userEime,userPhone,userPassWord,userBir
+		from gang_user where userId=#{userId}
+	</select> 
+	
+	<update id="updateUser" parameterType="org.lv.shop.util.Page">
+		update gang_user set userName=#{userName},loggerName=#{loggerName},userPassWord=#{userPassWord},userSex=#{userSex},userBir=#{userBir},userImg=#{userImg},userEime=#{userEime},userPhone=#{userPhone} where userId=#{userId}
+	</update>
+	
+	<select id="userLogin" resultType="org.lv.shop.entity.user.User" parameterType="org.lv.shop.entity.user.User">
+		select userId,userName,userImg from gang_user where loggerName=#{loggerName} and userPassWord=#{userPassWord}
+	</select>
+	
+	<select id="getRoleList" parameterType="string" resultType="org.lv.shop.entity.user.RoleR">
+		select sr.id roleId,sr.roleName from gang_user_role ur left join gang_role sr on ur.roleId=sr.id where ur.userId=#{userId}
+	</select>
+	
+	<select id="getMenuList" parameterType="string" resultType="org.lv.shop.entity.menu.Menu">
+		select m.menuId,m.permission from gang_role_menu rm LEFT JOIN t_menu m on rm.menuId=m.menuId where rm.roleId=#{roleId}
+	</select>
+	
+	<select id="getUserByUserName" parameterType="string" resultType="org.lv.shop.entity.user.User">
+		select userId,userName,loggerName,userImg,userSex,userEime,userPhone,userPassWord,userBir from gang_user where  loggerName=#{userName}
+	</select>
+</mapper>

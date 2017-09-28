@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.lv.shop.mapper.article.ArticleMapper" >
+	<select id="getArticleList" parameterType="org.lv.shop.util.Page" resultType="org.lv.shop.entity.article.Article">
+		select articleId,articleName,founder ,articleCreateDateTime from t_article where 1=1 
+		<if test="null!=obj.articleName and ''!=obj.articleName">
+			and articleName like  concat('%',#{obj.articleName},'%')
+		</if>
+		limit #{strat},#{pagecount}
+	</select>
+	
+	<select id="getArticleListCount" parameterType="org.lv.shop.util.Page" resultType="int">
+		select count(1) from t_article where 1=1
+	    <if test="null!=obj.articleName and ''!=obj.articleName">
+			and articleName like  concat('%',#{obj.articleName},'%')
+		</if>
+	</select>
+	
+	<insert id="insertArticle" parameterType="org.lv.shop.entity.article.Article">
+		insert into t_article values(#{articleId},#{articleName},#{articleContext},#{articleCreateDateTime},#{founder})
+	</insert>
+	
+	<delete id="deleteArticleById" parameterType="org.lv.shop.entity.article.Article">
+		delete from t_article where articleId=#{articleId}
+	</delete>
+	
+	<select id="toupdateArticleById" parameterType="string" resultType="org.lv.shop.entity.article.Article">
+		select articleId,articleName,founder,articleCreateDateTime ,articleContext from t_article where articleId=#{articleId}
+	</select>
+	
+	<update id="updateArticleById" parameterType="org.lv.shop.entity.article.Article">
+		update t_article set articleName=#{articleName},articleContext=#{articleContext},articleCreateDateTime=#{articleCreateDateTime}
+		where articleId=#{articleId}
+	</update>
+	
+	<delete id="deleteArticleByArray">
+		delete from t_article where articleId in 
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="toArticle" parameterType="string" resultType="org.lv.shop.entity.article.Article">
+		select articleId,articleName,founder,articleCreateDateTime ,articleContext from t_article where articleId=#{id}
+	</select>
+</mapper>

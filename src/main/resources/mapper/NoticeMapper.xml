@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.lv.shop.mapper.notice.NoticeMapper" >
+	<sql id="whereId">
+		<where>
+			<if test="null !=noticeName and ''!=noticeName">
+				and noticeName like concat('%',#{noticeName},'%')
+			</if>
+			<if test="null!=noticeValidatorStatus">
+				and noticeValidatorStatus=#{noticeValidatorStatus}
+			</if>
+			<if test="null!=noticeStatus">
+				and noticeStatus=#{noticeStatus}
+			</if>
+		</where>
+	</sql>
+	<select id="toNoticePageById" parameterType="string" resultType="org.lv.shop.entity.notice.Notice">
+		select noticeId,noticeName,noticeContext,noticeCreateTime,noticeEndTime,noticeStatus,noticeValidatorStatus from t_notice where noticeId =#{noticeId}
+	</select>
+	
+	<select id="getNoticeList" resultType="org.lv.shop.entity.notice.Notice" parameterType="org.lv.shop.entity.notice.Notice">
+		select noticeId,noticeName,noticeContext,noticeCreateTime,noticeEndTime,noticeStatus,noticeValidatorStatus
+		from t_notice
+		<include refid="whereId"></include>
+	</select>
+	
+	<select id="getNoticeCount" parameterType="org.lv.shop.entity.notice.Notice" resultType="int">
+		select count(*) from t_notice
+		<include refid="whereId"></include>
+	</select>
+	
+	<insert id="insertNotice" parameterType="org.lv.shop.entity.notice.Notice">
+		insert into t_notice values(#{noticeId},#{noticeName},#{noticeContext},#{noticeCreateTime},#{noticeEndTime},#{noticeStatus},#{noticeValidatorStatus})
+	</insert>
+	
+	<update id="updateNotice" parameterType="org.lv.shop.entity.notice.Notice">
+		update t_notice set noticeContext=#{noticeContext},noticeStatus=#{noticeStatus},noticeValidatorStatus=#{noticeValidatorStatus} where noticeId=#{noticeId}
+	</update>
+	
+	<update id="updateNoticeYes" parameterType="org.lv.shop.entity.notice.Notice">
+		update t_notice set noticeStatus=#{noticeStatus},noticeValidatorStatus=#{noticeValidatorStatus} where noticeId=#{noticeId}
+	</update>
+	
+	<update id="updateNoticeNo" parameterType="org.lv.shop.entity.notice.Notice">
+		update t_notice set noticeValidatorStatus=#{noticeValidatorStatus} where noticeId=#{noticeId}
+	</update>
+	
+	<update id="updateNoticeStatus" parameterType="org.lv.shop.entity.notice.Notice">
+		update t_notice set noticeStatus=#{noticeStatus} where noticeId=#{noticeId}
+	</update>
+	
+	<delete id="deleteNoticeAll" parameterType="string">
+		delete from t_notice where noticeId in
+		<foreach collection="array" open="(" close=")" separator="," item="noticeId">
+			#{noticeId}
+		</foreach>
+	</delete>
+</mapper>

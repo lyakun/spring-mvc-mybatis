@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.lv.shop.mapper.menu.MenuMapper" >
+	<select id="getTreeList" resultType="org.lv.shop.entity.menu.Menu" parameterType="string">
+		select menuId,menuName,pid,url menuUrl,permission from t_menu where menuId in (select tm.menuId from t_menu tm  left join gang_role_menu rm  on rm.menuId=tm.menuId
+		  left join gang_user_role gu on gu.roleId=rm.roleId where gu.userId=#{userId} ) and type="menu"
+	</select>
+	
+	<select id="getTreeListAll" resultType="org.lv.shop.entity.menu.Menu">
+		select DISTINCT tm.menuId,tm.menuName,tm.pid,tm.url menuUrl,tm.permission from t_menu tm  left join gang_role_menu rm  on rm.menuId=tm.menuId
+		  left join gang_user_role gu on gu.roleId=rm.roleId 
+	</select>
+	
+	<select id="getTreeListAllByUserId" resultType="org.lv.shop.entity.menu.Menu" parameterType="string">
+		select tm.menuId,tm.menuName,tm.pid,tm.url menuUrl,tm.permission from t_menu tm  left join gang_role_menu rm  on rm.menuId=tm.menuId
+		  left join gang_user_role gu on gu.roleId=rm.roleId where gu.userId=#{userId}
+	</select>
+</mapper>

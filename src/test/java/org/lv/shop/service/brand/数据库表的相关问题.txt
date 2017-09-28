@@ -1,0 +1,10 @@
+数据表的相关问题
+	1,ty_other_num_attribute 
+	2,ty_phone_attribute 
+	3,ty_unified_account_attribute 
+	4,ty_broadband_attribute
+	5,ty_account_num_attribute 
+	6,ty_mobile_attribute
+	这些表需要增加逻辑主键.在账号字段上家索引
+	
+		

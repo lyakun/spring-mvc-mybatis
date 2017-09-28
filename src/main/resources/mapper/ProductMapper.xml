@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.lv.shop.mapper.product.ProductMapper" >
+	<sql id="whereId">
+	<where>
+  		 	<if test="null!=obj.productName and ''!=obj.productName">
+  				and t.productName like concat('%',#{obj.productName},'%')
+	  		</if>
+	  		<if test="obj.productPriceMin > 0">
+	  			and t.productPrice >= #{obj.productPriceMin}
+	  		</if>
+	  		<if test="obj.productPriceMax >0">
+	  			and t.productPrice &lt;= #{obj.productPriceMax}
+	  		</if>
+	  		<if test='null!=obj.minCreatetime and ""!=obj.minCreatetime'>
+	  			and t.createtime >=#{obj.minCreatetime}
+	  		</if>
+	  		<if test='null!=obj.maxCreatetime and ""!=obj.maxCreatetime'>
+	  			and t.createtime &lt;=#{obj.maxCreatetime}
+	  		</if>
+	  		<if test="null!=obj.minUpdatetime and ''!=obj.minUpdatetime">
+	  			and t.updatetime >=#{obj.minUpdatetime}
+	  		</if>
+	  		<if test="null!=obj.maxUpdatetime and ''!=obj.maxUpdatetime">
+	  			and t.updatetime &lt;=#{obj.maxUpdatetime}
+	  		</if>
+	  		<if test="obj.maxStock >0">
+	  			and t.stock &lt;=#{obj.maxStock}
+	  		</if>
+	  		<if test="obj.minStock >0">
+	  			and t.stock >=#{obj.minStock}
+	  		</if>
+	  		<if test="null!=obj.brand.brandId and ''!=obj.brand.brandId">
+	  			and t.brandId=#{obj.brand.brandId}
+	  		</if>
+  	</where>
+	</sql>
+  <insert id="insertProduct" parameterType="org.lv.shop.entity.product.Product">
+  	insert into t_product values(#{productId},#{productName},#{productPrice},#{createtime},
+  	#{updatetime},#{productImg},#{stock},#{brand.brandId},#{stockWarn})
+  </insert>
+  
+  
+  <select id="getProductList"  resultType="org.lv.shop.entity.product.Product" parameterType="org.lv.shop.util.Page">
+  	select t.productId,t.productName,t.productPrice,t.productImg,b.brandName "brand.brandName",t.stock ,t.createtime ,t.updatetime ,t.stockWarn from t_product t left join t_brand b on t.brandId=b.brandId
+  	<include refid="whereId"></include>
+  	order by t.${obj.sort} ${obj.sortBy} limit #{strat},#{pagecount}
+  </select>
+  
+  
+  <select id="getProductListCount" resultType="java.lang.Integer" parameterType="org.lv.shop.util.Page">
+  	select count(1) from t_product t left join t_brand b on t.brandId=b.brandId
+  		<include refid="whereId"></include>
+  </select>
+  
+  
+  <delete id="deleteProductById" parameterType="string">
+  	delete from t_product where productId=#{productId}
+  </delete>
+  
+  
+  <select id="toupdateProductById" parameterType="string" resultType="org.lv.shop.entity.product.Product">
+  	select  t.productId,t.productName,t.productPrice,t.productImg,b.brandId "brand.brandId",t.stock,t.stockWarn,
+  	td.productDesc "desc.productDesc" from
+  	 t_product t left join t_brand b on t.brandId=b.brandId
+  	 left join t_desc td on t.productId=td.id
+  	where t.productId=#{productId}
+  </select>
+  
+  
+  <update id="updateProductById" parameterType="org.lv.shop.entity.product.Product">
+  	update t_product set productName=#{productName},productPrice=#{productPrice},
+  	updatetime=#{updatetime},productImg=#{productImg},stock=#{stock},
+  	brandId=#{brand.brandId} where productId=#{productId}
+  </update>
+  
+  
+  <delete id="deleteAllProductByIds" parameterType="string" >
+  	delete from t_product where productId in 
+  	<foreach collection="array" item="productId" open="("  separator="," close=")">
+  		#{productId}
+  	</foreach>
+  </delete>
+  
+  <insert id="insertImgAll" parameterType="org.lv.shop.entity.product.ImgAll">
+  	insert into t_imgall values(#{imgId},#{productId},#{imgUrl})
+  </insert>
+  
+  <select id="getshowProductImgAllPageById" parameterType="string" resultType="org.lv.shop.entity.product.ImgAll">
+  	select * from t_imgall where productId=#{id}
+  </select>
+  
+  <delete id="deleteFile" parameterType="int">
+  	delete from t_imgall where imgId=#{id}
+  </delete>
+  
+  <insert id="insertProductAll" parameterType="java.util.List">
+  	insert into t_product (productId,productName,productPrice,createtime,updatetime,stockWarn,stock) values
+  	<foreach collection="list" separator="," index="index" item="list">
+  		(#{list.productId,jdbcType=VARCHAR},#{list.productName,jdbcType=VARCHAR},
+  		#{list.productPrice,jdbcType=DOUBLE},#{list.createtime,jdbcType=DATE},
+  		#{list.updatetime,jdbcType=DATE},#{list.stockWarn,jdbcType=Integer},#{list.stock,jdbcType=Integer})
+  	</foreach>
+  </insert>
+  
+  <select id="toupdateProductImgById" parameterType="org.lv.shop.entity.product.Product" resultType="org.lv.shop.entity.product.Product">
+  	select productImg ,brandId "brand.brandId",productId from t_product where productId =#{productId}
+  </select>
+  
+  <update id="updateProductAllById" parameterType="org.lv.shop.entity.product.Product">
+  	update t_product set productImg=#{productImg} where productId=#{productId}
+  </update>
+  
+  <insert id="insertDesc" parameterType="org.lv.shop.entity.desc.Desc">
+  	insert into t_desc values(#{id},#{productDesc})
+  </insert>
+  
+  <select id="getProdcutByBrandId" parameterType="string" resultType="org.lv.shop.entity.product.Product">
+  	select productId,productName,productPrice,createtime,updatetime,stockWarn,stock from t_product where brandId=#{brandId}
+  </select>
+  
+  <select id="getProductAllList" parameterType="org.lv.shop.entity.product.Product" resultType="org.lv.shop.entity.product.Product">
+  	select t.productId,t.productName,t.productPrice,t.productImg,b.brandName "brand.brandName",b.brandId "brand.brandId",t.stock ,t.createtime ,t.updatetime ,t.stockWarn from t_product t left join t_brand b on t.brandId=b.brandId
+  	<where>
+  		<if test="null!=brand.brandId and ''!=brand.brandId">
+	  			and b.brandId=#{brand.brandId}
+	  		</if>
+  	</where>
+  </select>
+  
+  <select id="getProductImgAll" resultType="org.lv.shop.entity.product.ImgAll">
+  	select * from t_imgAll
+  </select>
+  
+  <select id="getProductListExport" resultType="org.lv.shop.entity.product.Product">
+  	select  t.productId,t.productName,b.brandName "brand.brandName",t.stock,b.brandId "brand.brandId"
+  	 from t_product t left join t_brand b on t.brandId=b.brandId where t.stock &lt;=t.stockWarn
+  </select>
+  
+  <select id="downFileById" parameterType="string" resultType="org.lv.shop.entity.product.ImgAll">
+  	select imgId,imgUrl from t_imgAll where imgId=#{id}
+  </select>
+  
+  <select id="getImgByIds" parameterType="string" resultType="org.lv.shop.entity.product.ImgAll">
+  	select imgId,imgUrl from t_imgAll where imgId in
+  	<foreach collection="array" separator="," index="index" item="id" open="(" close=")">
+		#{id}
+  	</foreach>
+  </select>
+</mapper>

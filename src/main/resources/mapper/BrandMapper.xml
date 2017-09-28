@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.lv.shop.mapper.brand.BrandMapper" >
+	<select id="getBrandList" resultType="org.lv.shop.entity.brand.Brand" parameterType="org.lv.shop.util.Page">
+		select brandId,brandName ,brandImg from t_brand 
+		<where>
+			<if test="null!=obj.brandName and ''!=obj.brandName">
+				brandName like concat ('%',#{obj.brandName},'%')
+			</if>
+		</where>
+		order by createtime desc limit #{strat},#{pagecount}
+	</select>
+	
+	<select id="getBrandListCount" resultType="int" parameterType="org.lv.shop.util.Page">
+		select count(1) from t_brand 
+		<where>
+			<if test="null!=obj.brandName and ''!=obj.brandName">
+				brandName like concat ('%',#{obj.brandName},'%')
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insertBrand" parameterType="org.lv.shop.entity.brand.Brand">
+		insert into t_brand values(#{brandId},#{brandName},#{brandImg},#{createtime},#{updatetime});
+	</insert>
+	
+	<delete id="deleteBrandById" parameterType="string">
+		delete from t_brand where brandId=#{brandId}
+	</delete>
+	
+	<select id="touodateBrandPage" parameterType="string" resultType="org.lv.shop.entity.brand.Brand">
+		select brandId,brandName ,brandImg from t_brand where brandId=#{brand}
+	</select>
+	
+	<update id="updateBrandById" parameterType="org.lv.shop.entity.brand.Brand">
+		update t_brand set brandName=#{brandName},brandImg=#{brandImg},updatetime=#{updatetime}
+		 where brandId=#{brandId}
+	</update>
+	
+	<delete id="deleteAllBrandtByIds" parameterType="string">
+		delete from t_brand where brandId in
+		<foreach collection="array" open="(" separator="," close=")" item="brandId">
+			#{brandId}
+		</foreach>
+	</delete>
+	
+	<select id="getBrandListAll" resultType="org.lv.shop.entity.brand.Brand">
+		select brandId,brandName from t_brand
+	</select>
+</mapper>
